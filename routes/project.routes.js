@@ -106,7 +106,10 @@ router.delete('/projects/:projectId', (req, res, next) => {
     }
 
     Project.findByIdAndRemove(projectId)
-        .then(() => res.json({ message: `Project with ${projectId} is removed successfully.` }))
+        .then(deteletedProject => {
+            return Task.deleteMany({ _id: { $in: deteletedProject.tasks } });
+        })
+        .then(() => res.json({ message: `Project with id ${projectId} & all associated tasks were removed successfully.` }))
         .catch(err => {
             console.log("error deleting project", err);
             res.status(500).json({
